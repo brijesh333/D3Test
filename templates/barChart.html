@@ -1,0 +1,55 @@
+<html>
+
+<head>
+    <title> D3 test </title>
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+    <script src="../d3/d3.v4.js"></script>
+    <script src="../d3/d3.v4.min.js"></script>
+    <!--<script src="script/script.js"></script>-->
+</head>
+
+<body>
+    <!--<div>
+        <p>hello</p>
+    </div>
+    <svg width="50" height="50">
+        <circle cx="25" cy="25" r="22" fill="blue" stroke="gray" stroke-width="2"></circle>
+    </svg>-->
+    <!--<div class="bar"></div>
+    <div style="display: inline-block;width: 20px;height: 75px;background-color: teal;"></div>-->
+    <!--<svg width="500" height="50"></svg>-->
+    <script>
+        //var dataset = [5, 10, 15, 20, 25];
+        var dataset = [];
+        for (var i = 0; i < 25; i++) { //Loop 25 times
+            //var newNumber = Math.random() * 30; //New random number (0-30)
+            var newNumber = Math.round(Math.random() * 30);
+            dataset.push(newNumber)
+                //dataset = dataset.concat(newNumber); //Add new number to array
+        }
+
+        // d3.select("body").selectAll("p").data(dataset).enter().append("p").text(function (d) {
+        //     return "value " + d;
+        // }).style("color", function (d) {
+        //     if (d < 20) {
+        //         return "red";
+        //     } else {
+        //         return "blue";
+        //     }
+        // });
+        d3.select("body").selectAll("div")
+            .data(dataset)
+            .enter()
+            .append("div")
+            .attr("class", "bar")
+            .style("height", function(d) {
+                return d * 10 + "px";
+            })
+            .style("margin-right", "10px");
+    </script>
+    <!--<script>
+        console.log("all selected element :- " + d3.selectAll("p"));
+    </script>-->
+</body>
+
+</html>

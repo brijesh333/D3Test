@@ -1,0 +1,270 @@
+<html>
+
+<head>
+    <title>
+        D3 Axis
+    </title>
+
+    <link rel="stylesheet" href="../css/style.css" type="text/css" />
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+
+    <script src="../d3/d3.v4.js"></script>
+    <script src="../d3/d3.v4.min.js"></script>
+    <!--<script src="../d3/d3.v3.js" type="text/javascritp"></script>
+    <script src="../d3/d3.v3.min.js" type="text/javascritp"></script>-->
+    <!--<script src="../d3/bootstrap.js"></script>
+    <script src="../d3/bootstrap.min.js"></script>-->
+    <!--<script src="../d3/jquery-3.1.1.js"></script>
+    <script src="../d3/jquery-3.1.1.min.js"></script>-->
+    <script src="../d3/jquery-2.2.4.js"></script>
+    <script src="../d3/jquery-2.2.4.min.js"></script>
+    <!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>-->
+    <!--<script src="../d3/jquery-1.11.1.js"></script>-->
+
+    <style type="text/css">
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: black;
+            shape-rendering: crispEdges;
+        }
+        
+        .axis text {
+            font-family: sans-serif;
+            font-size: 11px;
+        }
+        
+        .divProp {
+            height: 50%;
+            width: 40%;
+            border: 1px solid;
+        }
+        
+        .buttonDiv {
+            width: 100px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Combined charts</h1>
+    <!--<svg>
+        <circle cx="25" cy="25" r="20" fill="rgba(128, 0, 128, 0.75)"stroke="rgba(0, 255, 0, 0.25)" stroke-width="10"/>
+        <circle cx="65" cy="25" r="20" fill="rgba(128, 0, 128, 0.75)"stroke="rgba(0, 255, 0, 0.25)" stroke-width="10" opacity="0.5"/>
+        <circle cx="105" cy="25" r="20" fill="rgba(128, 0, 128, 0.75)"stroke="rgba(0, 255, 0, 0.25)" stroke-width="10" opacity="0.2"/>
+    </svg>-->
+    <!--<div id="frame container">
+        <div id="div1" class="divProp " style="float:left "></div>
+        <div id="div2" class="divProp " style="float:right "></div>
+    </div>-->
+    <div class="col-md-2">
+        <div class="buttonDiv">
+            <button type="button " id="scattered" class="buttonDiv ">Scattered</button>
+        </div>
+        <div class="buttonDiv">
+            <button type="button" id="bar" class="buttonDiv">bar</button>
+        </div>
+        <div class="buttonDiv">
+            <button type="button " id="line " class="buttonDiv ">Line</button>
+        </div>
+        <div class="buttonDiv ">
+            <button type="button" class="buttonDiv">Scattered</button>
+        </div>
+    </div>
+
+
+    <div id="graphContainer" class="col-md-8" style="border:1px solid; float:right"></div>
+
+
+    <script type="text/javascript ">
+        d3.select("#scattered")
+            .on("click", function() {
+                var w = 800;
+                var h = 500;
+                var padding = 30;
+                var radius = 6;
+
+                var dataset = [];
+                var numDataPoints = 50;
+                var xRange = Math.random() * 1000;
+                var yRange = Math.random() * 1000;
+                for (var i = 0; i < numDataPoints; i++) {
+                    var newNumber1 = Math.round(Math.random() * xRange);
+                    var newNumber2 = Math.round(Math.random() * yRange);
+                    dataset.push([newNumber1, newNumber2]);
+                }
+                var xScale = d3.scaleLinear()
+                    .domain([0, d3.max(dataset, function(d) {
+                        return d[0];
+                    })])
+                    .range([padding, w - padding * 2]);
+
+                var yScale = d3.scaleLinear()
+                    .domain([0, d3.max(dataset, function(d) {
+                        return d[1];
+                    })])
+                    .range([h - padding, padding]);
+                var rScale = d3.scaleLinear()
+                    .domain([0, d3.max(dataset, function(d) {
+                        return d[1];
+                    })])
+                    .range([2, 5]);
+                var circleAttrs = {
+                    cx: function(d) {
+                        return xScale(d[0]);
+                    },
+                    cy: function(d) {
+                        return yScale(d[1]);
+                    },
+                    r: radius
+                };
+                var svg = d3.select("#graphContainer")
+                    .append("svg")
+                    .attr("height", h)
+                    .attr("width", w)
+                    .attr("class", "col-md-12");
+                //.style("margin-left", "100px ")
+                svg.selectAll("circle")
+                    .data(dataset)
+                    .enter()
+                    .append("circle")
+                    .attr("cx", function(d) {
+                        return xScale(d[0]);
+                    })
+                    .attr("cy", function(d) {
+                        return yScale(d[1]);
+                    })
+                    .attr("r", function(d) {
+                        return rScale(d[1]);
+                    })
+                    .attr("fill", "red")
+
+                svg.selectAll("text")
+                    .data(dataset)
+                    .enter()
+                    .append("text")
+                    // .text(function(d) {
+                    //     return d[0] + ", " + d[1];
+                    // })
+                    .attr("x", function(d) {
+                        return xScale(d[0]);
+                    })
+                    .attr("y", function(d) {
+                        return yScale(d[1]);
+                    })
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "11px")
+                    .attr("fill", "red")
+                    .attr("class", "text");
+
+                var xAxis = d3.axisBottom()
+                    .scale(xScale)
+                    .ticks(5)
+                    //.tickFormat(formatAsPercentage);
+                    //.tickValues([1, 2, 3, 5, 8, 13, 21]);
+                var yAxis = d3.axisLeft()
+                    .scale(yScale)
+                    .ticks(5);
+
+                svg.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", "translate(0, " + (h - padding) + ") ")
+                    .call(xAxis);
+                svg.append("g")
+                    .attr("class", "y axis")
+                    .attr("transform", "translate( " + padding + ",0) ")
+                    .call(yAxis);
+
+                d3.select("#scattered")
+                    .on("click", function() {
+
+                        //New values for dataset
+                        var numValues = dataset.length; //Count original length of dataset
+                        var maxRange = Math.random() * 2000; //Max range of new values
+                        dataset = []; //Initialize empty array
+                        for (var i = 0; i < numValues; i++) { //Loop numValues times
+                            var newNumber1 = Math.floor(Math.random() * maxRange); //New random integer
+                            var newNumber2 = Math.floor(Math.random() * maxRange); //New random integer
+                            dataset.push([newNumber1, newNumber2]); //Add new number to array
+                        }
+                        //console.log(dataset);
+
+                        //Update scale domains
+                        xScale.domain([0, d3.max(dataset, function(d) {
+                                return d[0];
+                            })])
+                            //.range([padding, w - padding * 2]);
+                        yScale.domain([0, d3.max(dataset, function(d) {
+                                return d[1];
+                            })])
+                            //.range([padding, h - padding]);
+
+                        //Update all circles
+                        svg.selectAll("circle")
+                            .data(dataset)
+                            .transition()
+                            .duration(2000)
+                            .ease(d3.easeBounce)
+                            .attr("cx", function(d) {
+                                return xScale(d[0]);
+                            })
+                            .attr("cy", function(d) {
+                                return yScale(d[1]);
+                            })
+                            // .attr("fill", fucntion() {
+                            //     return rgb(200, 100, 100);
+                            //     //return "rgb(" + 200 + "," + 200 + "," + 200 + ")";
+                            // })
+                            // var xAxis = d3.axisBottom()
+                            //     .scale(xScale)
+                            //     .ticks(5);
+                            // var yAxis = d3.axisLeft()
+                            //     .scale(yScale)
+                            //     .ticks(5);
+                            //Update X axis
+                        svg.select(".x.axis")
+                            .transition()
+                            .duration(1000)
+                            .ease(d3.easeBounce)
+                            //.ease("linear")
+                            .call(xAxis);
+
+                        //Update Y axis
+                        svg.select(".y.axis")
+                            .transition()
+                            .duration(1000)
+                            //.ease("circle")
+                            .call(yAxis);
+                        // svg.selectAll("text")
+                        //     .data(dataset)
+                        //     .enter()
+                        //     //.append("text")
+                        //     .text(function(d) {
+                        //         return d[0] + ", " + d[1];
+                        //     })
+                        //     .attr("x", function(d) {
+                        //         return xScale(d[0]);
+                        //     })
+                        //     .attr("y", function(d) {
+                        //         return yScale(d[1]);
+                        //     })
+                        //     .attr("font-family", "sans-serif")
+                        //     .attr("font-size", "11px")
+                        //     .attr("fill", "red")
+                        //     .attr("class", "text");
+
+                    });
+            });
+
+        d3.select("#btn2")
+            .on("click", function() {
+                alert("hi");
+            })
+    </script>
+
+</body>
+
+</html>
