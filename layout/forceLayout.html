@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
     <style>
         .node {
-            fill: #ccc;
+            /*fill: #ccc;*/
             stroke: #fff;
             stroke-width: 2px;
         }
@@ -20,6 +20,31 @@
             stroke: #777;
             stroke-width: 2px;
         }
+        
+        #tooltip {
+            position: absolute;
+            width: 20px;
+            height: auto;
+            padding: 10px;
+            background-color: white;
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+            -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+        }
+        
+        #tooltip.hidden {
+            display: none;
+        }
+        
+        #tooltip p {
+            margin: 0;
+            font-family: sans-serif;
+            font-size: 16px;
+        }
         /*svg {
             background-color: grey;
         }*/
@@ -27,42 +52,128 @@
 </head>
 
 <body>
+    <div id="tooltip" class="hidden">
+        <!--<p><strong>Important Label Heading</strong></p>-->
+        <p><span id="value"></span></p>
+    </div>
+    <button type="button" id="btn">Randomize</button>
     <script>
         var data = {
             nodes: [{
-                name: "A",
-                x: 200,
-                y: 150
+                "label": "A",
+                "x": 469,
+                "y": 410
             }, {
-                name: "B",
-                x: 140,
-                y: 300
+                "label": "B",
+                "x": 493,
+                "y": 364
             }, {
-                name: "C",
-                x: 300,
-                y: 300
+                "label": "C",
+                "x": 442,
+                "y": 365
             }, {
-                name: "D",
-                x: 300,
-                y: 180
+                "label": "D",
+                "x": 467,
+                "y": 314
+            }, {
+                "label": "E",
+                "x": 477,
+                "y": 248
+            }, {
+                "label": "F",
+                "x": 425,
+                "y": 207
+            }, {
+                "label": "G",
+                "x": 402,
+                "y": 155
+            }, {
+                "label": "H",
+                "x": 369,
+                "y": 196
+            }, {
+                "label": "I",
+                "x": 350,
+                "y": 148
+            }, {
+                "label": "J",
+                "x": 539,
+                "y": 222
+            }, {
+                "label": "K",
+                "x": 594,
+                "y": 235
+            }, {
+                "label": "L",
+                "x": 582,
+                "y": 185
+            }, {
+                "label": "M",
+                "x": 633,
+                "y": 200
             }],
             links: [{
-                source: 0,
-                target: 1
+                "source": 0,
+                "target": 1
             }, {
-                source: 1,
-                target: 2
+                "source": 1,
+                "target": 2
             }, {
-                source: 2,
-                target: 3
-            }, ]
+                "source": 2,
+                "target": 0
+            }, {
+                "source": 1,
+                "target": 3
+            }, {
+                "source": 3,
+                "target": 2
+            }, {
+                "source": 3,
+                "target": 4
+            }, {
+                "source": 4,
+                "target": 5
+            }, {
+                "source": 5,
+                "target": 6
+            }, {
+                "source": 5,
+                "target": 7
+            }, {
+                "source": 6,
+                "target": 7
+            }, {
+                "source": 6,
+                "target": 8
+            }, {
+                "source": 7,
+                "target": 8
+            }, {
+                "source": 9,
+                "target": 4
+            }, {
+                "source": 9,
+                "target": 11
+            }, {
+                "source": 9,
+                "target": 10
+            }, {
+                "source": 10,
+                "target": 11
+            }, {
+                "source": 11,
+                "target": 12
+            }, {
+                "source": 12,
+                "target": 10
+            }]
         };
 
-        var c10 = d3.scale.category10();
+        var c10 = d3.scale.category20();
         var svg = d3.select("body")
             .append("svg")
-            .attr("width", 1200)
-            .attr("height", 800);
+            .attr("width", 800)
+            .attr("height", 600);
 
         var drag = d3.behavior.drag()
             .on("drag", function(d, i) {
@@ -101,8 +212,8 @@
                 d3.select(this).attr("y2", targetNode.y);
                 return targetNode.x
             })
-            .attr("fill", "none")
-            .attr("stroke", "white");
+            .attr("fill", "black")
+            .attr("stroke", "black");
 
         var nodes = svg.selectAll("node")
             .data(data.nodes)
@@ -117,14 +228,66 @@
             })
             .attr("r", 15)
             .attr("fill", function(d, i) {
+                //console.log(c10(i));
                 return c10(i);
+            })
+            .attr("value", function(d) {
+                return d.label;
+            })
+            .text(function(d) {
+                return d.label;
             })
             // .text(function(d) {
             //     return d.name;
             //     //console.log(d);
             // })
             // .attr("text-color", "red")
-            .call(drag);
+            .call(drag)
+            .on("mouseover", function(d) {
+                d3.select(this)
+                    .transition()
+                    .duration(1000)
+                    .attr("fill", "orange")
+                    // var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.rangeBand() / 2;
+                    // var yPosition = parseFloat(d3.select(this).attr("y")) + 14;
+                    //var xPosition = parseFloat(d3.select(this).attr("x")); // + xScale.rangeBand() / 2;
+                    //var yPosition = parseFloat(d3.select(this).attr("y")) / 2 + h / 2;
+                    //Update the tooltip position and value
+                d3.select("#tooltip")
+                    .style("left", d3.event.x + "px")
+                    .style("top", d3.event.y + "px")
+                    .select("#value")
+                    .text(d.label);
+                //Show the tooltip
+                d3.select("#tooltip").classed("hidden", false);
+            })
+            .on("mouseout", function() {
+                d3.select(this)
+                    .transition()
+                    .duration(1000)
+                    .attr("fill", function(d, i) {
+                        return "rgb(" + d.x % 255 + "," + d.x % 255 + ", " + d.y % 255 + ")";
+                    })
+                d3.select("#tooltip").classed("hidden", true);
+            })
+            // d3.json("dataForce.json", function(error, graph) {
+            //     alert(graph);
+            // });
+        var label = svg.selectAll(".mytext")
+            .data(nodes)
+            .enter()
+            .append("text")
+            .text(function(d) {
+                return d.label;
+            })
+            .style("text-anchor", "middle")
+            .style("fill", "white")
+            .style("font-family", "Arial")
+            .style("font-size", 12);
+        d3.select("#btn")
+            .on("click", function() {
+
+            })
     </script>
 </body>
 
