@@ -1,0 +1,43 @@
+<html>
+
+<head>
+    <title>
+        D3 Arrays
+    </title>
+    <script src="../d3/d3.v4.js"></script>
+    <script src="../d3/d3.v4.min.js"></script>
+
+</head>
+
+<body>
+    <script>
+        var dataset = [];
+        for (var i = 0; i < 10; i++) {
+            var randomNumber = Math.round(Math.random() * 100);
+            dataset.push(randomNumber);
+        }
+        //console.log(dataset);
+
+        console.log("minimum element :- " + d3.min(dataset));
+
+        console.log("maximum element :- " + d3.max(dataset));
+
+        console.log("extent elements :- " + d3.extent(dataset));
+
+        console.log("sum of all elements :- " + d3.sum(dataset));
+
+        console.log("mean of all elements :- " + d3.mean(dataset));
+
+        console.log("median of all elements :- " + d3.median(dataset));
+
+        console.log("quantile of elements :- " + d3.quantile(dataset, 0.25));
+
+        console.log("quantile of elements :- " + d3.quantile(dataset, 1));
+
+        console.log("variance of elements :- " + d3.variance(dataset));
+
+        console.log("deviation of elements :- " + d3.deviation(dataset));
+    </script>
+</body>
+
+</html>
