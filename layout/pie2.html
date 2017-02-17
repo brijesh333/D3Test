@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Testing Pie Chart</title>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <style type="text/css">
+        #chart {
+            margin-top: 100px;
+            position: absolute;
+            margin-right: 50px;
+            margin-left: 50px;
+        }
+        
+        .tooltip {
+            background: #eee;
+            box-shadow: 0 0 5px #999999;
+            color: #900C3F;
+            display: inline-block;
+            font-size: 12px;
+            left: 600px;
+            padding: 10px;
+            position: absolute;
+            text-align: center;
+            top: 95px;
+            width: 150px;
+            z-index: 10;
+            opacity: 1;
+        }
+        
+        rect {
+            stroke-width: 2;
+        }
+        
+        path {
+            stroke: #ffffff;
+            stroke-width: 0.5;
+        }
+        
+        div.tooltip {
+            position: absolute;
+            z-index: 999;
+            padding: 10px;
+            background: #f4f4f4;
+            border: 0px;
+            border-radius: 3px;
+            pointer-events: none;
+            font-size: 11px;
+            color: #000;
+            line-height: 16px;
+            border: 1px solid #d4d4d4;
+        }
+        
+        .legend {
+            /*margin-left: 300px;*/
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chart"></div>
+    <div id="toolTip" class="tooltip" style="opacity: 0;"></div>
+    <script type="text/javascript">
+        var div = d3.select("#toolTip");
+
+        var data = [
+            ["A", "20"],
+            ["B", "40"],
+            ["C", "80"],
+            ["D", "16"],
+            ["E", "50"],
+            ["F", "18"],
+            ["G", "30"]
+        ];
+
+        var width = 300,
+            height = 300;
+        var margin = {
+                top: 50,
+                right: 15,
+                bottom: 20,
+                left: 40
+            },
+            //radius = Math.min(width, height) / 2 - 10;
+            radius = 100
+        var legendRectSize = 18,
+            legendSpacing = 4;
+
+
+        var color = d3.scale.category20b();
+
+        var arc = d3.svg.arc()
+            .innerRadius(0)
+            .outerRadius(radius);
+
+        var arcOver = d3.svg.arc()
+            .innerRadius(10)
+            .outerRadius(radius + 10);
+
+        var pie = d3.layout.pie()
+            .sort(null)
+            .value(function(d) {
+                return d[1];
+            });
+
+        var labelArc = d3.svg.arc()
+            .outerRadius(radius - 40)
+            .innerRadius(radius - 40);
+
+        var svg = d3.select("#chart").append("svg")
+            .datum(data)
+            .attr("width", 500)
+            .attr("height", 500)
+            .append("g")
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        var arcs = svg.selectAll(".arc")
+            .data(pie)
+            .enter().append("g")
+            .attr("class", "arc");
+
+        var arcs2 = svg.selectAll(".arc2")
+            .data(pie)
+            .enter().append("g")
+            .attr("class", "arc2");
+
+
+        arcs.append("path")
+            .attr("fill", function(d, i) {
+                return color(i);
+            })
+            .on("mouseover", function(d) {
+                var htmlMsg = "";
+                div.transition()
+                    .style("opacity", 0.8);
+                var total = d3.sum(data.map(function(d) {
+                    return d[1];
+                }));
+                var percent = Math.round(1000 * d.data[1] / total) / 10;
+                div.html(
+                        "IP :" + d.data[0] + "" + "<br/>" +
+                        "Count : " + d.data[1] + "<br/>" +
+                        "Percent: " + percent + '%' + htmlMsg)
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY) + "px");
+
+                svg.selectAll("path").sort(function(a, b) {
+                    if (a != d) return -1;
+                    else return 1;
+                });
+
+                var endAngle = d.endAngle + 0.1;
+                var startAngle = d.startAngle - 0.1;
+                var arcOver = d3.svg.arc()
+                    //.innerRadius(radius) 
+                    .outerRadius(radius + 20)
+                    .endAngle(endAngle)
+                    .startAngle(startAngle);
+                d3.select(this)
+                    .attr("stroke", "white")
+                    .transition()
+                    .ease("bounce")
+                    .duration(1000)
+                    .attr("d", arcOver)
+                    .attr("stroke-width", 6);
+            })
+
+        .on("mouseout", function(d) {
+                div.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+                d3.select(this).transition()
+                    .attr("d", arc)
+                    .attr("stroke", "none");
+            })
+            .transition()
+            .ease("bounce")
+            .duration(2000)
+            .attrTween("d", tweenPie);
+
+        function tweenPie(b) {
+            b.innerRadius = 0;
+            var i = d3.interpolate({
+                startAngle: 0,
+                endAngle: 0
+            }, b);
+            return function(t) {
+                return arc(i(t));
+            };
+        }
+
+        var k = 0;
+        arcs2.append("text")
+            .transition()
+            .ease("elastic")
+            .duration(2000)
+            .delay(function(d, i) {
+                return i * 250;
+            })
+            .attr("x", "6")
+            .attr("dy", ".35em")
+            .text(function(d) {
+                if (d.data.count > 0) {
+                    k = k + 1;
+                    return d.data.count;
+                }
+            })
+            .attr("transform", function(d) {
+                if (k > 1) {
+                    return "translate(" + labelArc.centroid(d) + ") rotate(" + angle(d) + ")";
+                } else {
+                    return "rotate(-360)";
+                }
+            })
+            .attr("font-size", "10px");
+
+
+        function type(d) {
+            d.count = +d.count;
+            return d;
+        }
+
+        function angle(d) {
+            var a = (d.startAngle + d.endAngle) * 90 / Math.PI - 90;
+            return a > 90 ? a - 180 : a;
+        }
+
+        var legend = d3.select("#chart")
+            .append("svg")
+            .attr("class", "legend")
+            .attr("width", radius + 50)
+            .attr("height", radius * 2)
+            .attr("float", "right")
+            //.attr("margin-top", "135px")
+            .selectAll("g")
+            .data(color.domain())
+            .enter()
+            .append("g")
+            .attr("transform", function(d, i) {
+                return "translate(0," + i * 20 + ")";
+            });
+
+        legend.append('rect')
+            .attr('width', legendRectSize)
+            .attr('height', legendRectSize)
+            .style('fill', color)
+            .style('stroke', color);
+
+        legend.append('text')
+            .attr('x', legendRectSize + legendSpacing)
+            .attr('y', legendRectSize - legendSpacing)
+            .data(data)
+            .text(function(d, i) {
+                return d[0];
+            });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,97 @@
+<html>
+
+<head>
+    <title>
+        D3 stack layout
+    </title>
+    <script src="../d3/d3.v4.js"></script>
+    <script src="../d3/d3.v4.min.js"></script>
+
+</head>
+
+<body>
+    <script>
+        var w = 600;
+        var h = 300;
+        var dataset = [
+            [{
+                x: 0,
+                y: 5
+            }, {
+                x: 1,
+                y: 4
+            }, {
+                x: 2,
+                y: 2
+            }, {
+                x: 3,
+                y: 7
+            }, {
+                x: 4,
+                y: 23
+            }],
+            [{
+                x: 0,
+                y: 10
+            }, {
+                x: 1,
+                y: 12
+            }, {
+                x: 2,
+                y: 19
+            }, {
+                x: 3,
+                y: 23
+            }, {
+                x: 4,
+                y: 17
+            }],
+            [{
+                x: 0,
+                y: 22
+            }, {
+                x: 1,
+                y: 28
+            }, {
+                x: 2,
+                y: 32
+            }, {
+                x: 3,
+                y: 35
+            }, {
+                x: 4,
+                y: 43
+            }]
+        ];
+        var svg = d3.select("body")
+            .append("svg")
+            .attr("height", h)
+            .attr("width", w);
+        var xScale = d3.scaleOrdinal()
+            .domain([0, d3.max(function(d) {
+                return d[0]
+            })])
+            .range([0, 10]);
+        var yScale = d3.scaleOrdinal()
+            .domain([0, d3.max(function(d) {
+                return d[1]
+            })])
+            .range([0, 10]);
+        var rects = d3.selectAll("rect")
+            .data(dataset)
+            .enter()
+            .append("rect")
+            .attr("x", function(d, i) {
+                return xScale(i);
+            })
+            .attr("y", function(d) {
+                return yScale(d.y0);
+            })
+            .attr("height", function(d) {
+                return yScale(d.y);
+            })
+            //.attr("width", xScale.rangeBand());
+    </script>
+</body>
+
+</html>

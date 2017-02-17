@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>D3: Stack layout stacked bar chart</title>
+    <!--<script type="text/javascript" src="http://d3js.org/d3.v4.min.js"></script>-->
+    <script src="../d3/d3.v4.js"></script>
+    <script src="../d3/d3.v4.min.js"></script>
+    <style type="text/css">
+        /* No style rules here yet */
+    </style>
+</head>
+
+<body>
+    <script type="text/javascript">
+        //Width and height
+        var w = 500;
+        var h = 300;
+
+        //Original data
+        var dataset = [
+            // [{
+            //     x: 0,
+            //     y: 5
+            // }, {
+            //     x: 1,
+            //     y: 4
+            // }, {
+            //     x: 2,
+            //     y: 2
+            // }, {
+            //     x: 3,
+            //     y: 7
+            // }, {
+            //     x: 4,
+            //     y: 23
+            // }],
+            [{
+                x: 0,
+                y: 10
+            }, {
+                x: 1,
+                y: 12
+            }, {
+                x: 2,
+                y: 19
+            }, {
+                x: 3,
+                y: 23
+            }, {
+                x: 4,
+                y: 17
+            }],
+            // [{
+            //     x: 0,
+            //     y: 22
+            // }, {
+            //     x: 1,
+            //     y: 28
+            // }, {
+            //     x: 2,
+            //     y: 32
+            // }, {
+            //     x: 3,
+            //     y: 35
+            // }, {
+            //     x: 4,
+            //     y: 43
+            // }]
+        ];
+
+        //Set up stack method
+        var stack = d3.stack();
+
+        //Data, stacked
+        stack(dataset);
+
+        //Set up scales
+        var xMAx = dataset[0].length;
+        var xScale = d3.scaleLinear()
+            .domain([0, xMAx])
+            .range([0, w - 50]);
+        var yMax = d3.max(dataset, function(d) {
+            return d3.max(d, function(d) {
+                return d.y;
+            })
+        })
+        console.log("ymax value :- " + yMax);
+        // var yScale = d3.scaleLinear()
+        //     .domain([0,
+        //         d3.max(dataset, function(d) {
+        //             return d3.max(d, function(d) {
+        //                 return d.y;
+        //             });
+        //         })
+        //     ])
+        //     .range([0, h]);
+        var yScale = d3.scaleLinear()
+            .domain([0, yMax])
+            .range([h - 50, 0])
+
+        //Easy colors accessible via a 10-step ordinal scale
+        var colors = d3.scaleOrdinal(d3.schemeCategory20);
+        //var colors = d3.scale.category10();
+
+        //Create SVG element
+        var svg = d3.select("body")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h);
+
+        // Add a group for each row of data
+        var groups = svg.selectAll("g")
+            .data(dataset)
+            .enter()
+            .append("g")
+            .style("fill", function(d, i) {
+                return colors(i);
+            });
+
+        // Add a rect for each data value
+        var rects = groups.selectAll("rect")
+            .data(function(d) {
+                return d;
+            })
+            .enter()
+            .append("rect")
+            .attr("x", function(d, i) {
+                console.log("xscale value :- " + xScale(i));
+                return xScale(i);
+            })
+            .attr("y", function(d) {
+                console.log("yscale value :- " + yScale(d.y))
+                return yScale(d.y);
+            })
+            .attr("height", function(d) {
+                return h - yScale(d.y);
+            })
+            .attr("width", 30);
+    </script>
+</body>
+
+</html>

@@ -10,7 +10,7 @@
     <style>
         #tooltip {
             position: absolute;
-            width: 200px;
+            width: 30px;
             height: auto;
             padding: 10px;
             background-color: white;
@@ -39,6 +39,10 @@
             font-size: 12px;
             fill: white;
         }
+        
+        .legend {
+            margin-left: 100px;
+        }
     </style>
 
 </head>
@@ -52,6 +56,9 @@
     </div>
     <script>
         var dataset = [];
+        var legendRectSize = 18,
+            legendSpacing = 4;
+
         for (var i = 0; i < 10; i++) { //Loop 25 times
             //var newNumber = Math.random() * 30; //New random number (0-30)
 
@@ -119,9 +126,10 @@
                     .style("opacity", 0.5)
                     .select("#value")
                     .text(d.value)
-                    .select("#lbl")
-                    .text(d.value)
+                    // .select("#lbl")
+                    // .text(d.value)
                 d3.select("#tooltip").classed("hidden", false);
+                console.log(d.value);
             })
             .on("mouseout", function(d) {
                 // d3.select(this)
@@ -133,7 +141,26 @@
 
                 d3.select("#tooltip").classed("hidden", true);
 
+            })
+            // .append("text")
+            // .attr("transform", function(d) {
+            //     return "translate(" + arc.centroid(d) + ")";
+            // })
+            // .attr("text-anchor", "middle")
+            // .text(function(d) {
+            //     return d.value;
+            // });
+            .append("text")
+            .attr("transform", function(d) {
+                return "translate(" + arc.centroid(d) + ")";
+            })
+            .attr("text-anchor", "middle")
+            .text(function(d) {
+                return d.label;
             });
+
+
+
         d3.select("#tooltip").classed("hidden", true);
         d3.select("#btn")
             .on("click", function() {
@@ -203,7 +230,36 @@
 
                         d3.select("#tooltip").classed("hidden", true);
                     });
+            });
+        var legend = d3.select("body")
+            .append("svg")
+            .attr("class", "legend")
+            .attr("width", 20)
+            .attr("height", 200)
+            .attr("float", "right")
+            //.attr("margin-top", "135px")
+            .selectAll("g")
+            .data(color.domain())
+            .enter()
+            .append("g")
+            .attr("transform", function(d, i) {
+                return "translate(0," + i * 20 + ")";
+            });
+
+        legend.append('rect')
+            .attr('width', legendRectSize)
+            .attr('height', legendRectSize)
+            .style('fill', color)
+            .style('stroke', color);
+
+        legend.append('text')
+            .attr('x', legendRectSize + legendSpacing)
+            .attr('y', legendRectSize - legendSpacing)
+            .data(dataset)
+            .text(function(d, i) {
+                return d.label;
             })
+        var ease = d3.easeCubicInOut;
     </script>
 
 </body>
