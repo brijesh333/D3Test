@@ -9,10 +9,20 @@
     <script src="../d3/d3.v4.min.js"></script>
     <style type="text/css">
         /* No style rules here yet */
+        
+        .container {
+            margin-top: 20px;
+        }
+        
+        .graph {
+            margin-top: -600px;
+            margin-left: 20px;
+        }
     </style>
 </head>
 
 <body>
+    <div id="axes"></div>
     <script type="text/javascript">
         //Width and height
         var w = 500;
@@ -20,38 +30,38 @@
 
         //Original data
         var dataset = [
-            // [{
-            //     x: 0,
-            //     y: 5
-            // }, {
-            //     x: 1,
-            //     y: 4
-            // }, {
-            //     x: 2,
-            //     y: 2
-            // }, {
-            //     x: 3,
-            //     y: 7
-            // }, {
-            //     x: 4,
-            //     y: 23
-            // }],
             [{
                 x: 0,
-                y: 10
+                y: 5
             }, {
                 x: 1,
-                y: 12
+                y: 4
             }, {
                 x: 2,
-                y: 19
+                y: 2
             }, {
                 x: 3,
-                y: 23
+                y: 7
             }, {
                 x: 4,
-                y: 17
+                y: 23
             }],
+            // [{
+            //     x: 0,
+            //     y: 10
+            // }, {
+            //     x: 1,
+            //     y: 12
+            // }, {
+            //     x: 2,
+            //     y: 19
+            // }, {
+            //     x: 3,
+            //     y: 23
+            // }, {
+            //     x: 4,
+            //     y: 17
+            // }],
             // [{
             //     x: 0,
             //     y: 22
@@ -71,7 +81,10 @@
         ];
 
         //Set up stack method
-        var stack = d3.stack();
+        var stack = d3.stack()
+            .keys(["x", "y"])
+            .order(d3.stackOrderNone)
+            .offset(d3.stackOffsetNone);
 
         //Data, stacked
         stack(dataset);
@@ -81,8 +94,9 @@
         var xScale = d3.scaleLinear()
             .domain([0, xMAx])
             .range([0, w - 50]);
+        var temp = 0;
         var yMax = d3.max(dataset, function(d) {
-            return d3.max(d, function(d) {
+            return temp += d3.max(d, function(d) {
                 return d.y;
             })
         })
@@ -105,10 +119,44 @@
         //var colors = d3.scale.category10();
 
         //Create SVG element
+        var xAxis = d3.axisBottom()
+            .scale(xScale)
+            .ticks(5);
+        var yAxis = d3.axisLeft()
+            .scale(yScale)
+            .ticks(5);
+        var svg = d3.select("#axes")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h)
+            .attr("class", "container");
+        // svg.append("g")
+        //     .attr("class", "axes")
+        //     .attr("transform", "translate(20," + (h - 50) + ")")
+        //     .call(xAxis);
+        // svg.append("g")
+        //     .attr("class", "axes")
+        //     .attr("transform", "translate(" + 20 + ",0)")
+        //     .call(yAxis)
+
         var svg = d3.select("body")
             .append("svg")
             .attr("width", w)
-            .attr("height", h);
+            .attr("height", h)
+            //.attr("class", "graph")
+            .style("margin-top", "-300px")
+            .style("margin-left", "30px");
+
+        //.attr("margin-top", -w + "px");
+        // svg.append("g")
+        //     .attr("class", "axes")
+        //     .attr("transform", "translate(0," + (h - 20) + ")")
+        //     .call(xAxis);
+        // svg.append("g")
+        //     .attr("class", "axes")
+        //     .attr("transform", "translate(" + 20 + ",0)")
+        //     .call(yAxis);
+
 
         // Add a group for each row of data
         var groups = svg.selectAll("g")
@@ -135,9 +183,9 @@
                 return yScale(d.y);
             })
             .attr("height", function(d) {
-                return h - yScale(d.y);
+                return yScale(d.y);
             })
-            .attr("width", 30);
+            .attr("width", 50);
     </script>
 </body>
 
