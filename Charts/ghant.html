@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Gantt Chart Example 1</title>
+
+
+    <style>
+        /*html,
+        body,
+        #wrapper {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+        }*/
+        /*#wrapper {
+            width: 400px;
+            height: 400px;
+            margin: 0px;
+        }*/
+        
+        .x.axis line {
+            stroke: gray;
+            stroke-opacity: .5;
+        }
+        
+        .verticleTick {
+            border: 1px solid;
+        }
+        
+        .chart {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+        }
+        
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+        
+        .bar {
+            fill: #33b5e5;
+        }
+        
+        .bar-failed {
+            fill: #CC0000;
+        }
+        
+        .bar-running {
+            fill: #0047b3;
+        }
+        
+        .bar-succeeded {
+            fill: #33b5e5;
+        }
+        
+        .bar-killed {
+            fill: #ffbb33;
+        }
+        
+        #forkme_banner {
+            display: block;
+            position: absolute;
+            top: 0;
+            right: 10px;
+            z-index: 10;
+            padding: 10px 50px 10px 10px;
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+            border-bottom-left-radius: 2px;
+            border-bottom-right-radius: 2px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="fixed" style="float:left"></div>
+    <div id="wrapper" style="width:600px;overflow-x: auto;overflow-y: auto;float:left"></div>
+    <div id="xaxis"></div>
+
+    <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="d3-gantt-chart-d3v2.js"></script>
+    <!--<script type="text/javascript" src="example.js"></script>-->
+    <script>
+        var tasks = [{
+            "startDate": new Date("Sun Feb 09 01:36:45 EST 2016"),
+            "endDate": new Date("Sun Jun 09 02:36:45 EST 2017"),
+            "taskName": "A",
+            "status": "RUNNING"
+        }, {
+            "startDate": new Date("Sun Mar 09 04:56:32 EST 2016"),
+            "endDate": new Date("Sun Dec 09 06:35:47 EST 2016"),
+            "taskName": "B",
+            "status": "RUNNING"
+        }, {
+            "startDate": new Date("Sun Jan 09 06:29:53 EST 2017"),
+            "endDate": new Date("Sun Oct 09 06:34:04 EST 2017"),
+            "taskName": "C",
+            "status": "RUNNING"
+        }, {
+            "startDate": new Date("Sun Aug 09 05:35:21 EST 2016"),
+            "endDate": new Date("Sun Dec 09 06:21:22 EST 2018"),
+            "taskName": "D",
+            "status": "RUNNING"
+        }, {
+            "startDate": new Date("Sun Jan 09 05:00:06 EST 2017"),
+            "endDate": new Date("Sun Dec 09 05:05:07 EST 2017"),
+            "taskName": "E",
+            "status": "RUNNING"
+        }, {
+            "startDate": new Date("Sun May 09 05:00:06 EST 2017"),
+            "endDate": new Date("Sun Oct 09 05:05:07 EST 2017"),
+            "taskName": "F",
+            "status": "RUNNING"
+        }];
+
+        var taskStatus = {
+            "SUCCEEDED": "bar",
+            "FAILED": "bar-failed",
+            "RUNNING": "bar-running",
+            "KILLED": "bar-killed"
+        };
+
+        var taskNames = ["A", "B", "C", "D", "E", "F"];
+
+        tasks.sort(function(a, b) {
+            return a.endDate - b.endDate;
+        });
+        //console.log(new Date());
+        var future = d3.time.year.offset(new Date(), 2);
+        var maxDate = tasks[tasks.length - 1].endDate;
+        //console.log("maxdate :- " + maxDate);
+        //console.log("future :- " + future);
+        var maxDate = future;
+        tasks.sort(function(a, b) {
+            return a.startDate - b.startDate;
+        });
+        var minDate = tasks[0].startDate;
+
+        var format = "%Y";
+
+        var gantt = d3.gantt().taskTypes(taskNames).taskStatus(taskStatus).tickFormat(format).width(700).height(200);
+        gantt(tasks);
+    </script>
+</body>
+
+</html>
